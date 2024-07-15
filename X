@@ -1,0 +1,124 @@
+### Title: Customer Segmentation Using KMeans Clustering
+
+### Issue
+
+In today's competitive market, businesses need to understand their customers better to tailor their marketing strategies, improve customer satisfaction, and increase sales. However, with diverse customer bases, it can be challenging to identify distinct customer segments and their specific needs. Traditional methods of customer analysis may not efficiently handle large datasets or reveal meaningful patterns. This project aims to address this issue by using KMeans clustering to segment customers based on their demographics and behavioral data.
+
+### Purpose
+
+The purpose of this project is to apply KMeans clustering to a customer dataset to identify distinct segments within the customer base. By analyzing these segments, businesses can gain insights into different customer profiles, allowing for targeted marketing strategies, personalized customer service, and optimized product offerings. The project involves data preprocessing, clustering analysis, and visualization of the results to understand the characteristics of each customer segment.
+
+### Key Features
+
+- **Data Preprocessing:** Cleaning and normalizing customer data to prepare it for clustering analysis.
+- **KMeans Clustering:** Applying KMeans algorithm to group customers into distinct clusters based on their attributes.
+- **
+
+### Key Features
+
+- **Data Preprocessing:** Cleaning and normalizing customer data to prepare it for clustering analysis.
+- **KMeans Clustering:** Applying KMeans algorithm to group customers into distinct clusters based on their attributes.
+- **Cluster Analysis:** Examining the characteristics of each cluster to understand the differences and similarities between customer segments.
+- **Visualization:** Creating 2D and 3D scatter plots to visually represent the customer segments and their attributes.
+- **Cluster Descriptions:** Providing detailed descriptions of each cluster to facilitate understanding and application of the findings.
+
+### How It Works
+
+1. **Data Collection:** Load the customer dataset, which includes attributes such as age, income, years employed, and education.
+2. **Data Preprocessing:** Remove irrelevant columns, handle missing values, and normalize the data to ensure consistency and accuracy in clustering.
+3. **KMeans Clustering:** Apply the KMeans algorithm to the preprocessed data to group customers into a specified number of clusters (e.g., 3 clusters).
+4. **Cluster Assignment:** Assign cluster labels to each customer in the dataset based on the clustering results.
+5. **Cluster Analysis:** Calculate and analyze the average attributes for each cluster to understand the unique characteristics of each customer segment.
+6. **Visualization:** Create 2D and 3D scatter plots to visualize the distribution of customers within each cluster and their attributes.
+7. **Cluster Descriptions:** Provide detailed descriptions of each cluster, highlighting key characteristics such as average age, income, years employed, and education level.
+
+### Example Use Case
+
+- **Business Application:** A retail company wants to segment its customers to improve marketing strategies. By applying KMeans clustering, the company identifies distinct customer segments such as young professionals, middle-aged families, and retirees. This allows the company to tailor marketing campaigns, product recommendations, and customer service approaches to each segment, resulting in higher customer satisfaction and increased sales.
+
+### Code
+
+The project is implemented in Python, utilizing libraries such as Pandas, NumPy, Scikit-learn, and Matplotlib for data processing, clustering, and visualization.
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Load the dataset
+url = "https://raw.githubusercontent.com/anvarnarz/praktikum_datasets/main/customer_segmentation.csv"
+df = pd.read_csv(url)
+
+# Display the first few rows of the dataset
+print("Initial Data:")
+print(df.head())
+
+# Remove the Address column
+df.drop('Address', axis=1, inplace=True)
+
+# Normalize the data (excluding Customer ID)
+X = df.values[:, 1:]
+X = np.nan_to_num(X)
+norm_data = StandardScaler().fit_transform(X)
+
+# Apply KMeans clustering
+k = 3
+k_means = KMeans(n_clusters=k, init='k-means++', n_init=15, random_state=42)
+k_means.fit(norm_data)
+
+# Assign cluster labels to the data
+df['cluster'] = k_means.labels_
+
+# Display the first few rows with cluster labels
+print("Data with Cluster Labels:")
+print(df.head())
+
+# Analyze the clusters
+cluster_analysis = df.groupby('cluster').mean()
+print("Cluster Analysis:")
+print(cluster_analysis)
+
+# Visualization: 2D scatter plot
+plt.figure(figsize=(8, 6))
+plt.scatter(norm_data[:, 0], norm_data[:, 3], c=k_means.labels_, cmap='viridis', marker='o', s=50, alpha=0.5)
+plt.xlabel('Age', fontsize=18)
+plt.ylabel('Income', fontsize=16)
+plt.title('2D Scatter Plot of Customer Segmentation')
+plt.colorbar(label='Cluster Label')
+plt.show()
+
+# Visualization: 3D scatter plot
+fig = plt.figure(1, figsize=(12, 9))
+ax = fig.add_subplot(111, projection='3d')
+ax.set_xlabel('Years Employed')
+ax.set_ylabel('Age')
+ax.set_zlabel('Income')
+ax.view_init(elev=48, azim=120)
+
+ax.scatter(norm_data[:, 2], norm_data[:, 0], norm_data[:, 3], c=k_means.labels_.astype(float), cmap='viridis', marker='o', s=50, alpha=0.5)
+plt.title('3D Scatter Plot of Customer Segmentation')
+plt.show()
+
+# Print cluster centers
+print("Cluster Centers (in normalized scale):")
+print(k_means.cluster_centers_)
+
+# Transform the cluster centers back to original scale
+original_centers = StandardScaler().fit(X).inverse_transform(k_means.cluster_centers_)
+print("Cluster Centers (in original scale):")
+print(original_centers)
+
+# Task: Describe each cluster
+print("Cluster Descriptions:")
+for i in range(k):
+    cluster_data = df[df['cluster'] == i]
+    description = f"Cluster {i} -"
+    description += f" Avg Age: {cluster_data['Age'].mean():.2f},"
+    description += f" Avg Income: {cluster_data['Income'].mean():.2f},"
+    description += f" Avg Years Employed: {cluster_data['Years Employed'].mean():.2f},"
+    description += f" Avg Education: {cluster_data['Edu'].mean():.2f}"
+    print(description)
+```
